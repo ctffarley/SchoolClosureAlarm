@@ -102,9 +102,9 @@ class _MyHomePageState extends State<MyHomePage> {
               maxhour = 12;
             }
             if(maxmin < 10){
-              tim = (maxhour-12).toString() + ":0" + maxmin.toString();
+              tim = (maxhour).toString() + ":0" + maxmin.toString();
             }else{
-              tim = (maxhour-12).toString() + ":" + maxmin.toString();
+              tim = (maxhour).toString() + ":" + maxmin.toString();
             }
             tim += " am";
           }
@@ -124,9 +124,9 @@ class _MyHomePageState extends State<MyHomePage> {
               hour = 12;
             }
             if(min < 10){
-              tim = (hour-12).toString() + ":0" + min.toString();
+              tim = (hour).toString() + ":0" + min.toString();
             }else{
-              tim = (hour-12).toString() + ":" + min.toString();
+              tim = (hour).toString() + ":" + min.toString();
             }
             tim += " am";
           }
@@ -157,24 +157,69 @@ class _MyHomePageState extends State<MyHomePage> {
       }
       hour = index - hour;
       min = 60 - min;
+      if(min == 60){
+        min = 0;
+      }
       if(min != 0){
         hour--;
       }
+      double maxmins = _maxtime % 1;
+      int maxmin = (maxmins * 60).ceil();
+      int maxhour = _maxtime.truncate();
+      maxmin = 60 - maxmin;
+      if(maxmin == 60){
+        maxmin = 0;
+      }
+      if(maxmin != 0 ){
+        maxhour--;
+      }
       String tim = "";
+      if(maxhour < hour || (maxhour == hour && maxmin < min)){
+        if(maxhour >= 12){
+          if(maxhour == 12){
+            maxhour = 24;
+          }
+          if(maxmin < 10){
+            tim = (maxhour-12).toString() + ":0" + maxmin.toString();
+          }else{
+            tim = (maxhour-12).toString() + ":" + maxmin.toString();
+          }
+          tim += " pm";
+        }else{
+          if(maxhour == 0){
+            maxhour = 12;
+          }
+          if(maxmin < 10){
+            tim = (maxhour).toString() + ":0" + maxmin.toString();
+          }else{
+            tim = (maxhour).toString() + ":" + maxmin.toString();
+          }
+          tim += " am";
+        }
+      }else{
         if(hour >= 12){
           if(hour == 12){
             hour = 24;
           }
-          tim = (hour-12).toString() + ":" + min.toString();
+          if(min < 10){
+            tim = (hour-12).toString() + ":0" + min.toString();
+          }else{
+            tim = (hour-12).toString() + ":" + min.toString();
+          }
           tim += " pm";
         }else{
           if(hour == 0){
             hour = 12;
           }
-          tim = hour.toString() + ":" + min.toString();
+          if(min < 10){
+            tim = (hour).toString() + ":0" + min.toString();
+          }else{
+            tim = (hour).toString() + ":" + min.toString();
+          }
           tim += " am";
         }
-        _alarm = tim;
+      }
+      _alarm = tim;
     });
 
   }
@@ -187,6 +232,118 @@ class _MyHomePageState extends State<MyHomePage> {
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
       _maxtime  = time;
+      if(_alarmtime != 0){
+        double mins = _alarmtime % 1;
+        int min = (mins * 60).ceil();
+        int hour = _alarmtime.truncate();
+        int index = 24;
+        for(int i = 0; i < pressed.length; i++){
+          if(pressed[i]){
+            index = i;
+            break;
+          }
+        }
+        hour = index - hour;
+        min = 60 - min;
+        if(min == 60){
+          min = 0;
+        }
+        if(min != 0){
+          hour--;
+        }
+        double maxmins = _maxtime % 1;
+        int maxmin = (maxmins * 60).ceil();
+        int maxhour = _maxtime.truncate();
+        maxmin = 60 - maxmin;
+        if(maxmin == 60){
+          maxmin = 0;
+        }
+        if(maxmin != 0 ){
+          maxhour--;
+        }
+        String tim = "";
+        if(maxhour < hour || (maxhour == hour && maxmin < min)){
+          if(maxhour >= 12){
+            if(maxhour == 12){
+              maxhour = 24;
+            }
+            if(maxmin < 10){
+              tim = (maxhour-12).toString() + ":0" + maxmin.toString();
+            }else{
+              tim = (maxhour-12).toString() + ":" + maxmin.toString();
+            }
+            tim += " pm";
+          }else{
+            if(maxhour == 0){
+              maxhour = 12;
+            }
+            if(maxmin < 10){
+              tim = (maxhour).toString() + ":0" + maxmin.toString();
+            }else{
+              tim = (maxhour).toString() + ":" + maxmin.toString();
+            }
+            tim += " am";
+          }
+        }else{
+          if(hour >= 12){
+            if(hour == 12){
+              hour = 24;
+            }
+            if(min < 10){
+              tim = (hour-12).toString() + ":0" + min.toString();
+            }else{
+              tim = (hour-12).toString() + ":" + min.toString();
+            }
+            tim += " pm";
+          }else{
+            if(hour == 0){
+              hour = 12;
+            }
+            if(min < 10){
+              tim = (hour).toString() + ":0" + min.toString();
+            }else{
+              tim = (hour).toString() + ":" + min.toString();
+            }
+            tim += " am";
+          }
+        }
+        _alarm = tim;
+      }else{
+        double maxmins = _maxtime % 1;
+        int maxmin = (maxmins * 60).ceil();
+        int maxhour = _maxtime.truncate();
+        maxmin = 60 - maxmin;
+        if(maxmin == 60){
+          maxmin = 0;
+        }
+        if(maxmin != 0 ){
+          maxhour--;
+        }
+        String tim = "";
+        if(maxhour >= 12){
+          if(maxhour == 12){
+            maxhour = 24;
+          }
+          if(maxmin < 10){
+            tim = (maxhour-12).toString() + ":0" + maxmin.toString();
+          }else{
+            tim = (maxhour-12).toString() + ":" + maxmin.toString();
+          }
+          tim += " pm";
+        }else{
+          if(maxhour == 0){
+            maxhour = 12;
+          }
+          if(maxmin < 10){
+            tim = (maxhour).toString() + ":0" + maxmin.toString();
+          }else{
+            tim = (maxhour).toString() + ":" + maxmin.toString();
+          }
+          tim += " am";
+        }
+        _alarm = tim;
+      }
+      
     });
 
   }
