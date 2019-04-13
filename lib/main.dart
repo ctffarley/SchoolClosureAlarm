@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 void main() => runApp(MyApp());
 
@@ -43,11 +44,36 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
+class DelayData {
+  // will need to change this later with clark's data specs
+  final int userId;
+  final int id;
+  final String title;
+  final String body;
+
+  DelayData({this.userId, this.id, this.title, this.body});
+
+  factory DelayData.fromJson(Map<String, dynamic> json) {
+    return DelayData(
+      userId: json['userId'],
+      id: json['id'],
+      title: json['title'],
+      body: json['body'],
+    );
+  }
+}
+
 class _MyHomePageState extends State<MyHomePage> {
   String _alarm = "Not Entered";
   double _alarmtime = 0;
   double _maxtime = 0;
   List<bool> pressed = new List.filled(25, false);
+
+  Future<http.Response> fetchPost() {
+    return http.get('clarks server address here');
+  }
+
+  
 
   void _setAlarm() {
     setState(() {
