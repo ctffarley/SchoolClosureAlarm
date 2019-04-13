@@ -69,22 +69,67 @@ class _MyHomePageState extends State<MyHomePage> {
         }
         hour = index - hour;
         min = 60 - min;
+        if(min == 60){
+          min = 0;
+        }
         if(min != 0){
           hour--;
         }
+        double maxmins = _maxtime % 1;
+        int maxmin = (maxmins * 60).ceil();
+        int maxhour = _maxtime.truncate();
+        maxmin = 60 - maxmin;
+        if(maxmin == 60){
+          maxmin = 0;
+        }
+        if(maxmin != 0 ){
+          maxhour--;
+        }
         String tim = "";
-        if(hour >= 12){
-          if(hour == 12){
-            hour = 24;
+        if(maxhour < hour || (maxhour == hour && maxmin < min)){
+          if(maxhour >= 12){
+            if(maxhour == 12){
+              maxhour = 24;
+            }
+            if(maxmin < 10){
+              tim = (maxhour-12).toString() + ":0" + maxmin.toString();
+            }else{
+              tim = (maxhour-12).toString() + ":" + maxmin.toString();
+            }
+            tim += " pm";
+          }else{
+            if(maxhour == 0){
+              maxhour = 12;
+            }
+            if(maxmin < 10){
+              tim = (maxhour-12).toString() + ":0" + maxmin.toString();
+            }else{
+              tim = (maxhour-12).toString() + ":" + maxmin.toString();
+            }
+            tim += " am";
           }
-          tim = (hour-12).toString() + ":" + min.toString();
-          tim += " pm";
         }else{
-          if(hour == 0){
-            hour = 12;
+          if(hour >= 12){
+            if(hour == 12){
+              hour = 24;
+            }
+            if(min < 10){
+              tim = (hour-12).toString() + ":0" + min.toString();
+            }else{
+              tim = (hour-12).toString() + ":" + min.toString();
+            }
+            tim += " pm";
+          }else{
+            if(hour == 0){
+              hour = 12;
+            }
+            if(min < 10){
+              tim = (hour-12).toString() + ":0" + min.toString();
+            }else{
+              tim = (hour-12).toString() + ":" + min.toString();
+            }
+            tim += " am";
           }
-          tim = hour.toString() + ":" + min.toString();
-          tim += " am";
         }
         _alarm = tim;
       }
