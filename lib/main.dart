@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
         // or simply save your changes to "hot reload" in a Flutter IDE).
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
-        primarySwatch: Colors.purple,
+        primarySwatch: Colors.red,
       ),
       home: MyHomePage(title: 'Alarm Central'),
     );
@@ -45,16 +45,307 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   String _alarm = "Not Entered";
+  double _alarmtime = 0;
+  double _maxtime = 0;
+  List<bool> pressed = new List.filled(25, false);
 
-  void _setAlarm(String time) {
+  void _setAlarm() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
       // so that the display can reflect the updated values. If we changed
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
-      _alarm  = time;
+      if(_alarmtime != 0){
+        double mins = _alarmtime % 1;
+        int min = (mins * 60).ceil();
+        int hour = _alarmtime.truncate();
+        int index = 24;
+        for(int i = 0; i < pressed.length; i++){
+          if(pressed[i]){
+            index = i;
+            break;
+          }
+        }
+        hour = index - hour;
+        min = 60 - min;
+        if(min == 60){
+          min = 0;
+        }
+        if(min != 0){
+          hour--;
+        }
+        double maxmins = _maxtime % 1;
+        int maxmin = (maxmins * 60).ceil();
+        int maxhour = _maxtime.truncate();
+        maxmin = 60 - maxmin;
+        if(maxmin == 60){
+          maxmin = 0;
+        }
+        if(maxmin != 0 ){
+          maxhour--;
+        }
+        String tim = "";
+        if(maxhour < hour || (maxhour == hour && maxmin < min)){
+          if(maxhour >= 12){
+            if(maxhour == 12){
+              maxhour = 24;
+            }
+            if(maxmin < 10){
+              tim = (maxhour-12).toString() + ":0" + maxmin.toString();
+            }else{
+              tim = (maxhour-12).toString() + ":" + maxmin.toString();
+            }
+            tim += " pm";
+          }else{
+            if(maxhour == 0){
+              maxhour = 12;
+            }
+            if(maxmin < 10){
+              tim = (maxhour).toString() + ":0" + maxmin.toString();
+            }else{
+              tim = (maxhour).toString() + ":" + maxmin.toString();
+            }
+            tim += " am";
+          }
+        }else{
+          if(hour >= 12){
+            if(hour == 12){
+              hour = 24;
+            }
+            if(min < 10){
+              tim = (hour-12).toString() + ":0" + min.toString();
+            }else{
+              tim = (hour-12).toString() + ":" + min.toString();
+            }
+            tim += " pm";
+          }else{
+            if(hour == 0){
+              hour = 12;
+            }
+            if(min < 10){
+              tim = (hour).toString() + ":0" + min.toString();
+            }else{
+              tim = (hour).toString() + ":" + min.toString();
+            }
+            tim += " am";
+          }
+        }
+        _alarm = tim;
+      }
     });
+
+  }
+
+  void _setAlarmTime(double time) {
+    setState(() {
+      // This call to setState tells the Flutter framework that something has
+      // changed in this State, which causes it to rerun the build method below
+      // so that the display can reflect the updated values. If we changed
+      // _counter without calling setState(), then the build method would not be
+      // called again, and so nothing would appear to happen.
+      _alarmtime  = time;
+      double mins = _alarmtime % 1;
+      int min = (mins * 60).ceil();
+      int hour = _alarmtime.truncate();
+      int index = 24;
+      for(int i = 0; i < pressed.length; i++){
+        if(pressed[i]){
+          index = i;
+          break;
+        }
+      }
+      hour = index - hour;
+      min = 60 - min;
+      if(min == 60){
+        min = 0;
+      }
+      if(min != 0){
+        hour--;
+      }
+      double maxmins = _maxtime % 1;
+      int maxmin = (maxmins * 60).ceil();
+      int maxhour = _maxtime.truncate();
+      maxmin = 60 - maxmin;
+      if(maxmin == 60){
+        maxmin = 0;
+      }
+      if(maxmin != 0 ){
+        maxhour--;
+      }
+      String tim = "";
+      if(maxhour < hour || (maxhour == hour && maxmin < min)){
+        if(maxhour >= 12){
+          if(maxhour == 12){
+            maxhour = 24;
+          }
+          if(maxmin < 10){
+            tim = (maxhour-12).toString() + ":0" + maxmin.toString();
+          }else{
+            tim = (maxhour-12).toString() + ":" + maxmin.toString();
+          }
+          tim += " pm";
+        }else{
+          if(maxhour == 0){
+            maxhour = 12;
+          }
+          if(maxmin < 10){
+            tim = (maxhour).toString() + ":0" + maxmin.toString();
+          }else{
+            tim = (maxhour).toString() + ":" + maxmin.toString();
+          }
+          tim += " am";
+        }
+      }else{
+        if(hour >= 12){
+          if(hour == 12){
+            hour = 24;
+          }
+          if(min < 10){
+            tim = (hour-12).toString() + ":0" + min.toString();
+          }else{
+            tim = (hour-12).toString() + ":" + min.toString();
+          }
+          tim += " pm";
+        }else{
+          if(hour == 0){
+            hour = 12;
+          }
+          if(min < 10){
+            tim = (hour).toString() + ":0" + min.toString();
+          }else{
+            tim = (hour).toString() + ":" + min.toString();
+          }
+          tim += " am";
+        }
+      }
+      _alarm = tim;
+    });
+
+  }
+
+  void _setAlarmMax(double time) {
+    setState(() {
+      // This call to setState tells the Flutter framework that something has
+      // changed in this State, which causes it to rerun the build method below
+      // so that the display can reflect the updated values. If we changed
+      // _counter without calling setState(), then the build method would not be
+      // called again, and so nothing would appear to happen.
+      _maxtime  = time;
+      if(_alarmtime != 0){
+        double mins = _alarmtime % 1;
+        int min = (mins * 60).ceil();
+        int hour = _alarmtime.truncate();
+        int index = 24;
+        for(int i = 0; i < pressed.length; i++){
+          if(pressed[i]){
+            index = i;
+            break;
+          }
+        }
+        hour = index - hour;
+        min = 60 - min;
+        if(min == 60){
+          min = 0;
+        }
+        if(min != 0){
+          hour--;
+        }
+        double maxmins = _maxtime % 1;
+        int maxmin = (maxmins * 60).ceil();
+        int maxhour = _maxtime.truncate();
+        maxmin = 60 - maxmin;
+        if(maxmin == 60){
+          maxmin = 0;
+        }
+        if(maxmin != 0 ){
+          maxhour--;
+        }
+        String tim = "";
+        if(maxhour < hour || (maxhour == hour && maxmin < min)){
+          if(maxhour >= 12){
+            if(maxhour == 12){
+              maxhour = 24;
+            }
+            if(maxmin < 10){
+              tim = (maxhour-12).toString() + ":0" + maxmin.toString();
+            }else{
+              tim = (maxhour-12).toString() + ":" + maxmin.toString();
+            }
+            tim += " pm";
+          }else{
+            if(maxhour == 0){
+              maxhour = 12;
+            }
+            if(maxmin < 10){
+              tim = (maxhour).toString() + ":0" + maxmin.toString();
+            }else{
+              tim = (maxhour).toString() + ":" + maxmin.toString();
+            }
+            tim += " am";
+          }
+        }else{
+          if(hour >= 12){
+            if(hour == 12){
+              hour = 24;
+            }
+            if(min < 10){
+              tim = (hour-12).toString() + ":0" + min.toString();
+            }else{
+              tim = (hour-12).toString() + ":" + min.toString();
+            }
+            tim += " pm";
+          }else{
+            if(hour == 0){
+              hour = 12;
+            }
+            if(min < 10){
+              tim = (hour).toString() + ":0" + min.toString();
+            }else{
+              tim = (hour).toString() + ":" + min.toString();
+            }
+            tim += " am";
+          }
+        }
+        _alarm = tim;
+      }else{
+        double maxmins = _maxtime % 1;
+        int maxmin = (maxmins * 60).ceil();
+        int maxhour = _maxtime.truncate();
+        maxmin = 60 - maxmin;
+        if(maxmin == 60){
+          maxmin = 0;
+        }
+        if(maxmin != 0 ){
+          maxhour--;
+        }
+        String tim = "";
+        if(maxhour >= 12){
+          if(maxhour == 12){
+            maxhour = 24;
+          }
+          if(maxmin < 10){
+            tim = (maxhour-12).toString() + ":0" + maxmin.toString();
+          }else{
+            tim = (maxhour-12).toString() + ":" + maxmin.toString();
+          }
+          tim += " pm";
+        }else{
+          if(maxhour == 0){
+            maxhour = 12;
+          }
+          if(maxmin < 10){
+            tim = (maxhour).toString() + ":0" + maxmin.toString();
+          }else{
+            tim = (maxhour).toString() + ":" + maxmin.toString();
+          }
+          tim += " am";
+        }
+        _alarm = tim;
+      }
+      
+    });
+
   }
 
   @override
@@ -91,59 +382,454 @@ class _MyHomePageState extends State<MyHomePage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
+            Text("Please block off all hours that you have any activities tomorrow", textAlign: TextAlign.center,),
+            SizedBox(height: 10,),
             Table(
               border: TableBorder.all(color: Colors.black, width: 1),
               children: [
                 TableRow(
+                  decoration: BoxDecoration(color: pressed[0] ? Colors.red : Colors.white),
                   children: [
                     TableCell(
-                      child: Text("12:00 am",textAlign: TextAlign.center,)
+                      child: 
+                        GestureDetector(
+                          onTap: () {
+                            pressed[0] = !pressed[0];
+                            _setAlarm();
+                          },
+                          child: Text("12:00 am",textAlign: TextAlign.center,)
+                        ),
                     ),
                   ]
                 ),
                 TableRow(
+                  decoration: BoxDecoration(color: pressed[1] ? Colors.red : Colors.white),
                   children: [
                     TableCell(
-                      child: Text("1:00 am",textAlign: TextAlign.center,)
+                      child: 
+                        GestureDetector(
+                          onTap: () {
+                            pressed[1] = !pressed[1];
+                            _setAlarm();
+                          },
+                          child: Text("1:00 am",textAlign: TextAlign.center,)
+                        ),
                     ),
                   ]
                 ),
                 TableRow(
+                  decoration: BoxDecoration(color: pressed[2] ? Colors.red : Colors.white),
                   children: [
                     TableCell(
-                      child: Text("2:00 am",textAlign: TextAlign.center,)
+                      child:
+                        GestureDetector(
+                          onTap: () {
+                            pressed[2] = !pressed[2];
+                            _setAlarm();
+                              
+                            
+                          },
+                          child: Text("2:00 am",textAlign: TextAlign.center,)
+                        ),
                     ),
+                  ]
+                ),
+                TableRow(
+                  decoration: BoxDecoration(color: pressed[3] ? Colors.red : Colors.white),
+                  children: [
+                    TableCell(
+                      child: 
+                        GestureDetector(
+                          onTap: () {
+                            pressed[3] = !pressed[3];
+                            _setAlarm();
+                              
+                            
+                          },
+                          child: Text("3:00 am",textAlign: TextAlign.center,)
+                        ),
+                    ),
+                  ]
+                ),
+                TableRow(
+                  decoration: BoxDecoration(color: pressed[4] ? Colors.red : Colors.white),
+                  children: [
+                    TableCell(
+                      child: 
+                        GestureDetector(
+                          onTap: () {
+                            pressed[4] = !pressed[4];
+                            _setAlarm();
+                              
+                            
+                          },
+                          child: Text("4:00 am",textAlign: TextAlign.center,)
+                        ),                    ),
+                  ]
+                ),
+                TableRow(
+                  decoration: BoxDecoration(color: pressed[5] ? Colors.red : Colors.white),
+                  children: [
+                    TableCell(
+                      child: 
+                        GestureDetector(
+                          onTap: () {
+                            pressed[5] = !pressed[5];
+                            _setAlarm();
+                              
+                            
+                          },
+                          child: Text("5:00 am",textAlign: TextAlign.center,)
+                        ),                    ),
+                  ]
+                ),
+                TableRow(
+                  decoration: BoxDecoration(color: pressed[6] ? Colors.red : Colors.white),
+                  children: [
+                    TableCell(
+                      child: 
+                        GestureDetector(
+                          onTap: () {
+                            pressed[6] = !pressed[6];
+                            _setAlarm();
+                              
+                            
+                          },
+                          child: Text("6:00 am",textAlign: TextAlign.center,)
+                        ),                    ),
+                  ]
+                ),
+                TableRow(
+                  decoration: BoxDecoration(color: pressed[7] ? Colors.red : Colors.white),
+                  children: [
+                    TableCell(
+                      child: 
+                        GestureDetector(
+                          onTap: () {
+                            pressed[7] = !pressed[7];
+                            _setAlarm();
+                              
+                            
+                          },
+                          child: Text("7:00 am",textAlign: TextAlign.center,)
+                        ),                    ),
+                  ]
+                ),
+                TableRow(
+                  decoration: BoxDecoration(color: pressed[8] ? Colors.red : Colors.white),
+                  children: [
+                    TableCell(
+                      child: 
+                        GestureDetector(
+                          onTap: () {
+                            pressed[8] = !pressed[8];
+                            _setAlarm();
+                              
+                            
+                          },
+                          child: Text("8:00 am",textAlign: TextAlign.center,)
+                        ),                    ),
+                  ]
+                ),
+                TableRow(
+                  decoration: BoxDecoration(color: pressed[9] ? Colors.red : Colors.white),
+                  children: [
+                    TableCell(
+                      child: 
+                        GestureDetector(
+                          onTap: () {
+                            pressed[9] = !pressed[9];
+                            _setAlarm();
+                              
+                            
+                          },
+                          child: Text("9:00 am",textAlign: TextAlign.center,)
+                        ),                    ),
+                  ]
+                ),
+                TableRow(
+                  decoration: BoxDecoration(color: pressed[10] ? Colors.red : Colors.white),
+                  children: [
+                    TableCell(
+                      child: 
+                        GestureDetector(
+                          onTap: () {
+                            pressed[10] = !pressed[10];
+                            _setAlarm();
+                              
+                            
+                          },
+                          child: Text("10:00 am",textAlign: TextAlign.center,)
+                        ),                    ),
+                  ]
+                ),
+                TableRow(
+                  decoration: BoxDecoration(color: pressed[11] ? Colors.red : Colors.white),
+                  children: [
+                    TableCell(
+                      child: 
+                        GestureDetector(
+                          onTap: () {
+                            pressed[11] = !pressed[11];
+                            _setAlarm();
+                              
+                            
+                          },
+                          child: Text("11:00 am",textAlign: TextAlign.center,)
+                        ),                    ),
+                  ]
+                ),
+                TableRow(
+                  decoration: BoxDecoration(color: pressed[12] ? Colors.red : Colors.white),
+                  children: [
+                    TableCell(
+                      child: 
+                        GestureDetector(
+                          onTap: () {
+                            pressed[12] = !pressed[12];
+                            _setAlarm();
+                              
+                            
+                          },
+                          child: Text("12:00 pm",textAlign: TextAlign.center,)
+                        ),                    ),
+                  ]
+                ),
+                TableRow(
+                  decoration: BoxDecoration(color: pressed[13] ? Colors.red : Colors.white),
+                  children: [
+                    TableCell(
+                      child: 
+                        GestureDetector(
+                          onTap: () {
+                            pressed[13] = !pressed[13];
+                            _setAlarm();
+                              
+                            
+                          },
+                          child: Text("1:00 pm",textAlign: TextAlign.center,)
+                        ),                    ),
+                  ]
+                ),
+                TableRow(
+                  decoration: BoxDecoration(color: pressed[14] ? Colors.red : Colors.white),
+                  children: [
+                    TableCell(
+                      child: 
+                        GestureDetector(
+                          onTap: () {
+                            pressed[14] = !pressed[14];
+                            _setAlarm();
+                              
+                            
+                          },
+                          child: Text("2:00 pm",textAlign: TextAlign.center,)
+                        ),                    ),
+                  ]
+                ),
+                TableRow(
+                  decoration: BoxDecoration(color: pressed[15] ? Colors.red : Colors.white),
+                  children: [
+                    TableCell(
+                      child: 
+                        GestureDetector(
+                          onTap: () {
+                            pressed[15] = !pressed[15];
+                            _setAlarm();
+                              
+                            
+                          },
+                          child: Text("3:00 pm",textAlign: TextAlign.center,)
+                        ),                    ),
+                  ]
+                ),
+                TableRow(
+                  decoration: BoxDecoration(color: pressed[16] ? Colors.red : Colors.white),
+                  children: [
+                    TableCell(
+                      child: 
+                        GestureDetector(
+                          onTap: () {
+                            pressed[16] = !pressed[16];
+                            _setAlarm();
+                              
+                            
+                          },
+                          child: Text("4:00 pm",textAlign: TextAlign.center,)
+                        ),                    ),
+                  ]
+                ),
+                TableRow(
+                  decoration: BoxDecoration(color: pressed[17] ? Colors.red : Colors.white),
+                  children: [
+                    TableCell(
+                      child: 
+                        GestureDetector(
+                          onTap: () {
+                            pressed[17] = !pressed[17];
+                            _setAlarm();
+                              
+                            
+                          },
+                          child: Text("5:00 pm",textAlign: TextAlign.center,)
+                        ),                    ),
+                  ]
+                ),
+                TableRow(
+                  decoration: BoxDecoration(color: pressed[18] ? Colors.red : Colors.white),
+                  children: [
+                    TableCell(
+                      child: 
+                        GestureDetector(
+                          onTap: () {
+                            pressed[18] = !pressed[18];
+                            _setAlarm();
+                              
+                            
+                          },
+                          child: Text("6:00 pm",textAlign: TextAlign.center,)
+                        ),                    ),
+                  ]
+                ),
+               TableRow(
+                  decoration: BoxDecoration(color: pressed[19] ? Colors.red : Colors.white),
+                  children: [
+                    TableCell(
+                      child: 
+                        GestureDetector(
+                          onTap: () {
+                            pressed[19] = !pressed[19];
+                            _setAlarm();
+                              
+                            
+                          },
+                          child: Text("7:00 pm",textAlign: TextAlign.center,)
+                        ),                    ),
+                  ]
+                ),
+                TableRow(
+                  decoration: BoxDecoration(color: pressed[20] ? Colors.red : Colors.white),
+                  children: [
+                    TableCell(
+                      child: 
+                        GestureDetector(
+                          onTap: () {
+                            pressed[20] = !pressed[20];
+                            _setAlarm();
+                              
+                            
+                          },
+                          child: Text("8:00 pm",textAlign: TextAlign.center,)
+                        ),                    ),
+                  ]
+                ),
+                TableRow(
+                  decoration: BoxDecoration(color: pressed[21] ? Colors.red : Colors.white),
+                  children: [
+                    TableCell(
+                      child: 
+                        GestureDetector(
+                          onTap: () {
+                            pressed[21] = !pressed[21];
+                            _setAlarm();
+                              
+                            
+                          },
+                          child: Text("9:00 pm",textAlign: TextAlign.center,)
+                        ),                    ),
+                  ]
+                ),
+                TableRow(
+                  decoration: BoxDecoration(color: pressed[22] ? Colors.red : Colors.white),
+                  children: [
+                    TableCell(
+                      child: 
+                        GestureDetector(
+                          onTap: () {
+                            pressed[22] = !pressed[22];
+                            _setAlarm();
+                              
+                            
+                          },
+                          child: Text("10:00 pm",textAlign: TextAlign.center,)
+                        ),                    ),
+                  ]
+                ),
+                TableRow(
+                  decoration: BoxDecoration(color: pressed[23] ? Colors.red : Colors.white),
+                  children: [
+                    TableCell(
+                      child: 
+                        GestureDetector(
+                          onTap: () {
+                            pressed[23] = !pressed[23];
+                            _setAlarm();
+                              
+                            
+                          },
+                          child: Text("11:00 pm",textAlign: TextAlign.center,)
+                        ),                    ),
+                  ]
+                ),
+                TableRow(
+                  decoration: BoxDecoration(color: pressed[24] ? Colors.red : Colors.white),
+                  children: [
+                    TableCell(
+                      child: 
+                        GestureDetector(
+                          onTap: () {
+                            pressed[24] = !pressed[24];
+                            _setAlarm();
+                              
+                            
+                          },
+                          child: Text("12:00 am",textAlign: TextAlign.center,)
+                        ),                    ),
                   ]
                 ),
               ]
             ),
             SizedBox(
-              height:10
+              height:20
             ),
             Text(
-              'You wish to wake up at:',
-            ),
-            SizedBox(
-              height:50
-            ),
-            Text(
-              '$_alarm',
-              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 24),
-            ),
-            SizedBox(
-              height:100
-            ),
-            Text(
-              "Please enter when you want to wake up:"
+              "Please enter how many hours you wish to wake up before your first blocked off activity:"
             ),
             TextField (
               textAlign: TextAlign.center,
               keyboardType: TextInputType.datetime,
               style: TextStyle(color: Colors.black, fontWeight: FontWeight.w500),
               onSubmitted: (value){
-                _setAlarm(value);
+                _setAlarmTime(double.parse(value));
               },
-            )
+            ),
+            SizedBox(
+              height:20
+            ),
+            Text(
+              "Please enter the latest hour in 24 hour time you wish to wake up in the event of a cancellation:"
+            ),
+            TextField (
+              textAlign: TextAlign.center,
+              keyboardType: TextInputType.datetime,
+              style: TextStyle(color: Colors.black, fontWeight: FontWeight.w500),
+              onSubmitted: (value){
+                _setAlarmMax(double.parse(value));
+              },
+            ),
+            SizedBox(
+              height:10
+            ),
+            Text(
+              'Your alarm is currently set for:',
+            ),
+            SizedBox(
+              height:10
+            ),
+            Text(
+              '$_alarm',
+              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 24),
+            ),
           ],
         ),
       ),
