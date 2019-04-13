@@ -14,7 +14,6 @@ for span in all_spans:
     try:
         close_string = re.search("closed", span.contents[0])
         if close_string:
-            print(close_string.string)
-            print(re.findall(r"closed", close_string.string))
+            print(re.findall(r"\w+, \w+ \d+, \d+", close_string.string))
     except:
         continue
