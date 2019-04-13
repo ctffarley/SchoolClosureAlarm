@@ -48,9 +48,12 @@ class _MyHomePageState extends State<MyHomePage> {
   double _alarmtime = 0;
   double _maxtime = 0;
   List<bool> pressed = new List.filled(25, false);
+  var date = new DateTime.now();
 
   void _setAlarm() {
     setState(() {
+      date = new DateTime.now();
+      date = date.add(new Duration(days: 1));
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
       // so that the display can reflect the updated values. If we changed
@@ -92,43 +95,43 @@ class _MyHomePageState extends State<MyHomePage> {
               maxhour = 24;
             }
             if(maxmin < 10){
-              tim = (maxhour-12).toString() + ":0" + maxmin.toString();
+              tim = (maxhour-12).toString() + ":0" + maxmin.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString() ;
             }else{
-              tim = (maxhour-12).toString() + ":" + maxmin.toString();
+              tim = (maxhour-12).toString() + ":" + maxmin.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
             }
-            tim += " pm";
           }else{
             if(maxhour == 0){
               maxhour = 12;
             }
             if(maxmin < 10){
-              tim = (maxhour).toString() + ":0" + maxmin.toString();
+              tim = (maxhour).toString() + ":0" + maxmin.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
             }else{
-              tim = (maxhour).toString() + ":" + maxmin.toString();
+              tim = (maxhour).toString() + ":" + maxmin.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
             }
-            tim += " am";
           }
         }else{
+          while(hour < 0){
+            hour += 24;
+            date = date.add(new Duration(days: -1));
+          }
           if(hour >= 12){
             if(hour == 12){
               hour = 24;
             }
             if(min < 10){
-              tim = (hour-12).toString() + ":0" + min.toString();
+              tim = (hour-12).toString() + ":0" + min.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
             }else{
-              tim = (hour-12).toString() + ":" + min.toString();
+              tim = (hour-12).toString() + ":" + min.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
             }
-            tim += " pm";
           }else{
             if(hour == 0){
               hour = 12;
             }
             if(min < 10){
-              tim = (hour).toString() + ":0" + min.toString();
+              tim = (hour).toString() + ":0" + min.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
             }else{
-              tim = (hour).toString() + ":" + min.toString();
+              tim = (hour).toString() + ":" + min.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
             }
-            tim += " am";
           }
         }
         _alarm = tim;
@@ -139,6 +142,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _setAlarmTime(double time) {
     setState(() {
+      date = new DateTime.now();
+      date = date.add(new Duration(days: 1));
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
       // so that the display can reflect the updated values. If we changed
@@ -180,43 +185,43 @@ class _MyHomePageState extends State<MyHomePage> {
             maxhour = 24;
           }
           if(maxmin < 10){
-            tim = (maxhour-12).toString() + ":0" + maxmin.toString();
+            tim = (maxhour-12).toString() + ":0" + maxmin.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
           }else{
-            tim = (maxhour-12).toString() + ":" + maxmin.toString();
+            tim = (maxhour-12).toString() + ":" + maxmin.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
           }
-          tim += " pm";
         }else{
           if(maxhour == 0){
             maxhour = 12;
           }
           if(maxmin < 10){
-            tim = (maxhour).toString() + ":0" + maxmin.toString();
+            tim = (maxhour).toString() + ":0" + maxmin.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
           }else{
-            tim = (maxhour).toString() + ":" + maxmin.toString();
+            tim = (maxhour).toString() + ":" + maxmin.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
           }
-          tim += " am";
         }
       }else{
+        while(hour < 0){
+            hour += 24;
+            date = date.add(new Duration(days: -1));
+        }
         if(hour >= 12){
           if(hour == 12){
             hour = 24;
           }
           if(min < 10){
-            tim = (hour-12).toString() + ":0" + min.toString();
+            tim = (hour-12).toString() + ":0" + min.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
           }else{
-            tim = (hour-12).toString() + ":" + min.toString();
+            tim = (hour-12).toString() + ":" + min.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
           }
-          tim += " pm";
         }else{
           if(hour == 0){
             hour = 12;
           }
           if(min < 10){
-            tim = (hour).toString() + ":0" + min.toString();
+            tim = (hour).toString() + ":0" + min.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
           }else{
-            tim = (hour).toString() + ":" + min.toString();
+            tim = (hour).toString() + ":" + min.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
           }
-          tim += " am";
         }
       }
       _alarm = tim;
@@ -226,6 +231,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _setAlarmMax(double time) {
     setState(() {
+      date = new DateTime.now();
+      date = date.add(new Duration(days: 1));
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
       // so that the display can reflect the updated values. If we changed
@@ -268,43 +275,43 @@ class _MyHomePageState extends State<MyHomePage> {
               maxhour = 24;
             }
             if(maxmin < 10){
-              tim = (maxhour-12).toString() + ":0" + maxmin.toString();
+              tim = (maxhour-12).toString() + ":0" + maxmin.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
             }else{
-              tim = (maxhour-12).toString() + ":" + maxmin.toString();
+              tim = (maxhour-12).toString() + ":" + maxmin.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
             }
-            tim += " pm";
           }else{
             if(maxhour == 0){
               maxhour = 12;
             }
             if(maxmin < 10){
-              tim = (maxhour).toString() + ":0" + maxmin.toString();
+              tim = (maxhour).toString() + ":0" + maxmin.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
             }else{
-              tim = (maxhour).toString() + ":" + maxmin.toString();
+              tim = (maxhour).toString() + ":" + maxmin.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
             }
-            tim += " am";
           }
         }else{
+          while(hour < 0){
+            hour += 24;
+            date = date.add(new Duration(days: -1));
+          }
           if(hour >= 12){
             if(hour == 12){
               hour = 24;
             }
             if(min < 10){
-              tim = (hour-12).toString() + ":0" + min.toString();
+              tim = (hour-12).toString() + ":0" + min.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
             }else{
-              tim = (hour-12).toString() + ":" + min.toString();
+              tim = (hour-12).toString() + ":" + min.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
             }
-            tim += " pm";
           }else{
             if(hour == 0){
               hour = 12;
             }
             if(min < 10){
-              tim = (hour).toString() + ":0" + min.toString();
+              tim = (hour).toString() + ":0" + min.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
             }else{
-              tim = (hour).toString() + ":" + min.toString();
+              tim = (hour).toString() + ":" + min.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
             }
-            tim += " am";
           }
         }
         _alarm = tim;
@@ -325,21 +332,19 @@ class _MyHomePageState extends State<MyHomePage> {
             maxhour = 24;
           }
           if(maxmin < 10){
-            tim = (maxhour-12).toString() + ":0" + maxmin.toString();
+            tim = (maxhour-12).toString() + ":0" + maxmin.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
           }else{
-            tim = (maxhour-12).toString() + ":" + maxmin.toString();
+            tim = (maxhour-12).toString() + ":" + maxmin.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
           }
-          tim += " pm";
         }else{
           if(maxhour == 0){
             maxhour = 12;
           }
           if(maxmin < 10){
-            tim = (maxhour).toString() + ":0" + maxmin.toString();
+            tim = (maxhour).toString() + ":0" + maxmin.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
           }else{
-            tim = (maxhour).toString() + ":" + maxmin.toString();
+            tim = (maxhour).toString() + ":" + maxmin.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
           }
-          tim += " am";
         }
         _alarm = tim;
       }
@@ -793,11 +798,11 @@ class _MyHomePageState extends State<MyHomePage> {
               height:20
             ),
             Text(
-              "Please enter how many hours you wish to wake up before your first blocked off activity:"
+              "Please enter how many hours you wish to wake up before your first blocked off activity:", textAlign: TextAlign.center,
             ),
             TextField (
               textAlign: TextAlign.center,
-              keyboardType: TextInputType.datetime,
+              keyboardType: TextInputType.number,
               style: TextStyle(color: Colors.black, fontWeight: FontWeight.w500),
               onSubmitted: (value){
                 _setAlarmTime(double.parse(value));
@@ -807,11 +812,11 @@ class _MyHomePageState extends State<MyHomePage> {
               height:20
             ),
             Text(
-              "Please enter the latest hour in 24 hour time you wish to wake up in the event of a cancellation:"
+              "Please enter the latest hour in 24 hour time you wish to wake up in the event of a cancellation:", textAlign: TextAlign.center,
             ),
             TextField (
               textAlign: TextAlign.center,
-              keyboardType: TextInputType.datetime,
+              keyboardType: TextInputType.number,
               style: TextStyle(color: Colors.black, fontWeight: FontWeight.w500),
               onSubmitted: (value){
                 _setAlarmMax(double.parse(value));
@@ -821,7 +826,7 @@ class _MyHomePageState extends State<MyHomePage> {
               height:10
             ),
             Text(
-              'Your alarm is currently set for:',
+              'Your alarm is currently set for:', textAlign: TextAlign.center,
             ),
             SizedBox(
               height:10
