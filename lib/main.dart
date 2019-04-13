@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:async';
 
 void main() => runApp(MyApp());
 
@@ -63,15 +65,23 @@ class DelayData {
   }
 }
 
+Future<DelayData> fetchPost() async {
+  final response = await http.get('https://jsonplaceholder.typicode.com/posts/1');
+
+  if (response.statusCode == 200) {
+    // If the call to the server was successful, parse the JSON
+    return DelayData.fromJson(json.decode(response.body));
+  } else {
+    // If that call was not successful, throw an error.
+    throw Exception('Failed to load post');
+  }
+}
+
 class _MyHomePageState extends State<MyHomePage> {
   String _alarm = "Not Entered";
   double _alarmtime = 0;
   double _maxtime = 0;
   List<bool> pressed = new List.filled(25, false);
-
-  Future<http.Response> fetchPost() {
-    return http.get('clarks server address here');
-  }
 
   
 
