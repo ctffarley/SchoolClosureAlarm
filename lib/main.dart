@@ -159,6 +159,44 @@ class _MyHomePageState extends State<MyHomePage> {
     flutterLocalNotificationsPlugin.initialize(initializationSettings);
     timer = Timer.periodic(Duration(seconds: 15), (Timer t) => setState(() {}) );
   }
+
+  void _cancelNotState(){
+    date = new DateTime.now();
+      date = date.add(new Duration(days: 1));
+      
+      _settime = _maxtime;
+      double maxmins = _maxtime % 1;
+      int maxmin = (maxmins * 60).ceil();
+      int maxhour = _maxtime.truncate();
+      maxmin = 60 - maxmin;
+      if(maxmin == 60){
+        maxmin = 0;
+      }
+      if(maxmin != 0 ){
+        maxhour--;
+      }
+      String tim = "";
+      if(maxhour >= 12){
+        if(maxhour == 12){
+          maxhour = 24;
+        }
+        if(maxmin < 10){
+          tim += (maxhour-12).toString() + ":0" + maxmin.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
+        }else{
+          tim += (maxhour-12).toString() + ":" + maxmin.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
+        }
+      }else{
+        if(maxhour == 0){
+          maxhour = 12;
+        }
+        if(maxmin < 10){
+          tim += (maxhour).toString() + ":0" + maxmin.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
+        }else{
+          tim += (maxhour).toString() + ":" + maxmin.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
+        }
+      }
+      _alarm = tim;
+  }
   
   void _cancelAlarm() {
     setState(() {
@@ -1033,26 +1071,23 @@ class _MyHomePageState extends State<MyHomePage> {
             SizedBox(
               height:10
             ),
-            Text(
-              '$_alarm',
-              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 24),
-            ),
-            
             FutureBuilder<DelayData>(
               future: _fetchPost(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   if(snapshot.data.day == date.day){
                     closed = true;
-                    //_cancelAlarm();
+                    _cancelNotState();
                     return Text(
-                    "SCHOOL IS CANCELLED",
-                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 24),
+                    "SCHOOL IS CANCELLED\n$_alarm",
+                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 24,),
+                    textAlign: TextAlign.center,
                     );
                   }else{
                     return Text(
-                    "School is on time",
+                    "School is on time\n$_alarm",
                     style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 24),
+                    textAlign: TextAlign.center,
                     );
                   }
                 } else if (snapshot.hasError) {
@@ -1062,7 +1097,13 @@ class _MyHomePageState extends State<MyHomePage> {
                 // By default, show a loading spinner
                 return CircularProgressIndicator();
               },
-            ), // FutureBuilder
+            ), 
+           /*Text(
+              '$_alarm',
+              style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 24),
+            ),*/
+            
+            // FutureBuilder
             
           ],
         ),
