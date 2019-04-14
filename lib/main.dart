@@ -7,11 +7,13 @@ import 'dart:typed_data';
 
 FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
 String _alarm = "Not Entered";
-  double _alarmtime = 0;
-  double _maxtime = 0;
-  List<bool> pressed = new List.filled(25, false);
-  var date = new DateTime.now();
-  double _settime = 0;
+double _alarmtime = 0;
+double _maxtime = 0;
+List<bool> pressed = new List.filled(25, false);
+var date = (new DateTime.now()).add(new Duration(days: 1));
+double _settime = 0;
+bool closed = false;
+Timer timer;
 
 void main() async {
   flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
@@ -155,6 +157,7 @@ class _MyHomePageState extends State<MyHomePage> {
     var initializationSettingsIOS = IOSInitializationSettings();
     var initializationSettings = InitializationSettings(initializationSettingsAndroid, initializationSettingsIOS);
     flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    timer = Timer.periodic(Duration(seconds: 15), (Timer t) => setState(() {}) );
   }
   
   void _cancelAlarm() {
@@ -173,7 +176,7 @@ class _MyHomePageState extends State<MyHomePage> {
       if(maxmin != 0 ){
         maxhour--;
       }
-      String tim = "School is CANCELLED\n";
+      String tim = "";
       if(maxhour >= 12){
         if(maxhour == 12){
           maxhour = 24;
@@ -200,6 +203,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _setAlarm() {
     setState(() {
+      if(closed){
+        _cancelAlarm();
+        return;
+      }
       date = new DateTime.now();
       date = date.add(new Duration(days: 1));
       // This call to setState tells the Flutter framework that something has
@@ -292,6 +299,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _setAlarmTime(double time) {
     setState(() {
+      if(closed){
+        _cancelAlarm();
+        return;
+      }
       date = new DateTime.now();
       date = date.add(new Duration(days: 1));
       // This call to setState tells the Flutter framework that something has
@@ -383,6 +394,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _setAlarmMax(double time) {
     setState(() {
+      if(closed){
+        _maxtime  = time;
+        _cancelAlarm();
+        return;
+      }
       date = new DateTime.now();
       date = date.add(new Duration(days: 1));
       // This call to setState tells the Flutter framework that something has
@@ -1021,12 +1037,24 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_alarm',
               style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 24),
             ),
-            /*
+            
             FutureBuilder<DelayData>(
               future: _fetchPost(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  return Text(snapshot.data.month);
+                  if(snapshot.data.day == date.day){
+                    closed = true;
+                    //_cancelAlarm();
+                    return Text(
+                    "SCHOOL IS CANCELLED",
+                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 24),
+                    );
+                  }else{
+                    return Text(
+                    "School is on time",
+                    style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 24),
+                    );
+                  }
                 } else if (snapshot.hasError) {
                   return Text("${snapshot.error}");
                 }
@@ -1035,7 +1063,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 return CircularProgressIndicator();
               },
             ), // FutureBuilder
-            */
+            
           ],
         ),
       ),
