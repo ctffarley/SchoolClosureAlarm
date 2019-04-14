@@ -63,8 +63,8 @@ class DelayData {
   }
 }
 
-Future<DelayData> fetchPost() async {
-  final response = await http.get('3.83.174.78/api/closure');
+Future<DelayData> _fetchPost() async {
+  final response = await http.get('http://3.83.174.78/api/closure');
 
   if (response.statusCode == 200) {
     // If the call to the server was successful, parse the JSON
@@ -80,8 +80,6 @@ class _MyHomePageState extends State<MyHomePage> {
   double _alarmtime = 0;
   double _maxtime = 0;
   List<bool> pressed = new List.filled(25, false);
-
-  
 
   void _setAlarm() {
     setState(() {
@@ -847,7 +845,7 @@ class _MyHomePageState extends State<MyHomePage> {
               textAlign: TextAlign.center,
               keyboardType: TextInputType.datetime,
               style: TextStyle(color: Colors.black, fontWeight: FontWeight.w500),
-              onSubmitted: (value){
+              onSubmitted: (value) async {
                 _setAlarmMax(double.parse(value));
               },
             ),
@@ -864,6 +862,21 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_alarm',
               style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 24),
             ),
+            /*
+            FutureBuilder<DelayData>(
+              future: _fetchPost(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Text(snapshot.data.month);
+                } else if (snapshot.hasError) {
+                  return Text("${snapshot.error}");
+                }
+
+                // By default, show a loading spinner
+                return CircularProgressIndicator();
+              },
+            ), // FutureBuilder
+            */
           ],
         ),
       ),
