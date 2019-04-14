@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:async';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'dart:typed_data';
 
@@ -68,7 +71,6 @@ Future<void> _scheduleNotification() async {
       platformChannelSpecifics);
 }
 
-
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
@@ -110,6 +112,35 @@ class MyHomePage extends StatefulWidget {
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
+}
+
+class DelayData {
+  // from 3.83.174.78/api/closure, clark's api
+  final String month;
+  final int day;
+  final int year;
+
+  DelayData({this.month, this.day, this.year});
+
+  factory DelayData.fromJson(Map<String, dynamic> json) {
+    return DelayData(
+      month: json['month'],
+      day: json['num'],
+      year: json['year'],
+    );
+  }
+}
+
+Future<DelayData> _fetchPost() async {
+  final response = await http.get('http://3.83.174.78/api/closure');
+
+  if (response.statusCode == 200) {
+    // If the call to the server was successful, parse the JSON
+    return DelayData.fromJson(json.decode(response.body));
+  } else {
+    // If that call was not successful, throw an error.
+    throw Exception('Failed to load post');
+  }
 }
 
 class _MyHomePageState extends State<MyHomePage> {
@@ -949,6 +980,21 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_alarm',
               style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 24),
             ),
+            /*
+            FutureBuilder<DelayData>(
+              future: _fetchPost(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Text(snapshot.data.month);
+                } else if (snapshot.hasError) {
+                  return Text("${snapshot.error}");
+                }
+
+                // By default, show a loading spinner
+                return CircularProgressIndicator();
+              },
+            ), // FutureBuilder
+            */
           ],
         ),
       ),
