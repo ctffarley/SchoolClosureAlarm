@@ -135,7 +135,7 @@ class DelayData {
 }
 
 Future<DelayData> _fetchPost() async {
-  final response = await http.get('http://3.83.174.78/api/closure');
+  final response = await http.get('http://54.173.226.214/api/closure');
 
   if (response.statusCode == 200) {
     // If the call to the server was successful, parse the JSON
@@ -236,6 +236,96 @@ class _MyHomePageState extends State<MyHomePage> {
       }
       _alarm = tim;
     });
+
+  }
+
+  void _notStateSetAlarm(){
+    date = new DateTime.now();
+      date = date.add(new Duration(days: 1));
+      // This call to setState tells the Flutter framework that something has
+      // changed in this State, which causes it to rerun the build method below
+      // so that the display can reflect the updated values. If we changed
+      // _counter without calling setState(), then the build method would not be
+      // called again, and so nothing would appear to happen.
+      if(_alarmtime != 0){
+        double mins = _alarmtime % 1;
+        int min = (mins * 60).ceil();
+        int hour = _alarmtime.truncate();
+        int index = 24;
+        for(int i = 0; i < pressed.length; i++){
+          if(pressed[i]){
+            index = i;
+            break;
+          }
+        }
+        hour = index - hour;
+        min = 60 - min;
+        if(min == 60){
+          min = 0;
+        }
+        if(min != 0){
+          hour--;
+        }
+        double maxmins = _maxtime % 1;
+        int maxmin = (maxmins * 60).ceil();
+        int maxhour = _maxtime.truncate();
+        maxmin = 60 - maxmin;
+        if(maxmin == 60){
+          maxmin = 0;
+        }
+        if(maxmin != 0 ){
+          maxhour--;
+        }
+        String tim = "";
+        if(maxhour < hour || (maxhour == hour && maxmin < min)){
+          _settime = _maxtime;
+          if(maxhour >= 12){
+            if(maxhour == 12){
+              maxhour = 24;
+            }
+            if(maxmin < 10){
+              tim = (maxhour-12).toString() + ":0" + maxmin.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString() ;
+            }else{
+              tim = (maxhour-12).toString() + ":" + maxmin.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
+            }
+          }else{
+            if(maxhour == 0){
+              maxhour = 12;
+            }
+            if(maxmin < 10){
+              tim = (maxhour).toString() + ":0" + maxmin.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
+            }else{
+              tim = (maxhour).toString() + ":" + maxmin.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
+            }
+          }
+        }else{
+          _settime = _alarmtime;
+          while(hour < 0){
+            hour += 24;
+            date = date.add(new Duration(days: -1));
+          }
+          if(hour >= 12){
+            if(hour == 12){
+              hour = 24;
+            }
+            if(min < 10){
+              tim = (hour-12).toString() + ":0" + min.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
+            }else{
+              tim = (hour-12).toString() + ":" + min.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
+            }
+          }else{
+            if(hour == 0){
+              hour = 12;
+            }
+            if(min < 10){
+              tim = (hour).toString() + ":0" + min.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
+            }else{
+              tim = (hour).toString() + ":" + min.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
+            }
+          }
+        }
+        _alarm = tim;
+      }
 
   }
 
@@ -1079,13 +1169,15 @@ class _MyHomePageState extends State<MyHomePage> {
                     closed = true;
                     _cancelNotState();
                     return Text(
-                    "SCHOOL IS CANCELLED\n$_alarm",
+                    "$_alarm\nSCHOOL IS CANCELLED",
                     style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 24,),
                     textAlign: TextAlign.center,
                     );
                   }else{
+                    closed = false;
+                    _notStateSetAlarm();
                     return Text(
-                    "School is on time\n$_alarm",
+                    "$_alarm\nSchool is on time",
                     style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 24),
                     textAlign: TextAlign.center,
                     );
