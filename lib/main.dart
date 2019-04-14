@@ -66,6 +66,7 @@ Future<void> _scheduleNotification() async {
       'GET UP!',
       scheduledNotificationDateTime,
       platformChannelSpecifics);
+  await _cancelNotification();
 }
 
 
@@ -125,6 +126,46 @@ class _MyHomePageState extends State<MyHomePage> {
     flutterLocalNotificationsPlugin.initialize(initializationSettings);
   }
   
+  void _cancelAlarm() {
+    setState(() {
+      date = new DateTime.now();
+      date = date.add(new Duration(days: 1));
+      
+      _settime = _maxtime;
+      double maxmins = _maxtime % 1;
+      int maxmin = (maxmins * 60).ceil();
+      int maxhour = _maxtime.truncate();
+      maxmin = 60 - maxmin;
+      if(maxmin == 60){
+        maxmin = 0;
+      }
+      if(maxmin != 0 ){
+        maxhour--;
+      }
+      String tim = "School is CANCELLED\n";
+      if(maxhour >= 12){
+        if(maxhour == 12){
+          maxhour = 24;
+        }
+        if(maxmin < 10){
+          tim += (maxhour-12).toString() + ":0" + maxmin.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
+        }else{
+          tim += (maxhour-12).toString() + ":" + maxmin.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
+        }
+      }else{
+        if(maxhour == 0){
+          maxhour = 12;
+        }
+        if(maxmin < 10){
+          tim += (maxhour).toString() + ":0" + maxmin.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
+        }else{
+          tim += (maxhour).toString() + ":" + maxmin.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
+        }
+      }
+      _alarm = tim;
+    });
+
+  }
 
   void _setAlarm() {
     setState(() {
