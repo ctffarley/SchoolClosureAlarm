@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request, abort
 from scrape import next_close
 
 app = Flask(__name__)
@@ -25,7 +25,11 @@ def get_date():
 @app.route('/api/switch', methods=['POST'])
 def switch_date():
     global closed
-    closed = not closed
+    if not request.json:
+        abort(400)
+    else:
+        closed = not closed
+        return ("switched", str(201))
 
 if __name__ == '__main__':
     app.run(debug=True)
