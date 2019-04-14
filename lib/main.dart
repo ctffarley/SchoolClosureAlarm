@@ -47,26 +47,24 @@ class MyHomePage extends StatefulWidget {
 }
 
 class DelayData {
-  // will need to change this later with clark's data specs
-  final int userId;
-  final int id;
-  final String title;
-  final String body;
+  // from 3.83.174.78/api/closure, clark's api
+  final String month;
+  final int day;
+  final int year;
 
-  DelayData({this.userId, this.id, this.title, this.body});
+  DelayData({this.month, this.day, this.year});
 
   factory DelayData.fromJson(Map<String, dynamic> json) {
     return DelayData(
-      userId: json['userId'],
-      id: json['id'],
-      title: json['title'],
-      body: json['body'],
+      month: json['month'],
+      day: json['num'],
+      year: json['year'],
     );
   }
 }
 
 Future<DelayData> fetchPost() async {
-  final response = await http.get('https://jsonplaceholder.typicode.com/posts/1');
+  final response = await http.get('3.83.174.78/api/closure');
 
   if (response.statusCode == 200) {
     // If the call to the server was successful, parse the JSON
