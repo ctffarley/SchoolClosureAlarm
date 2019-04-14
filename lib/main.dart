@@ -2,8 +2,74 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'dart:typed_data';
 
-void main() => runApp(MyApp());
+FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+String _alarm = "Not Entered";
+  double _alarmtime = 0;
+  double _maxtime = 0;
+  List<bool> pressed = new List.filled(25, false);
+  var date = new DateTime.now();
+  double _settime = 0;
+
+void main() async {
+  flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
+  runApp(MyApp());
+} 
+
+Future<void> _cancelNotification() async {
+    await flutterLocalNotificationsPlugin.cancelAll();
+}
+
+Future<void> _scheduleNotification() async {
+  double mins = _settime % 1;
+  int min = (mins * 60).ceil();
+  int hour = _settime.truncate();
+  int index = 24;
+  for(int i = 0; i < pressed.length; i++){
+    if(pressed[i]){
+      index = i;
+      break;
+    }
+  }
+  hour = index - hour;
+  min = 60 - min;
+  if(min == 60){
+    min = 0;
+  }
+  if(min != 0){
+    hour--;
+  }
+  var scheduledNotificationDateTime = DateTime.now().add(new Duration(minutes: 1));
+      //new DateTime(date.year,date.month,date.day, hour, min);
+  var vibrationPattern = Int64List(4);
+  vibrationPattern[0] = 0;
+  vibrationPattern[1] = 1000;
+  vibrationPattern[2] = 5000;
+  vibrationPattern[3] = 2000;
+
+  var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+      'your other channel id',
+      'your other channel name',
+      'your other channel description',
+      icon: 'secondary_icon',
+      sound: 'slow_spring_board',
+      largeIcon: 'sample_large_icon',
+      largeIconBitmapSource: BitmapSource.Drawable,
+      vibrationPattern: vibrationPattern,
+      color: const Color.fromARGB(255, 255, 0, 0));
+  var iOSPlatformChannelSpecifics =
+      IOSNotificationDetails(sound: "slow_spring_board.aiff");
+  var platformChannelSpecifics = NotificationDetails(
+      androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+  await flutterLocalNotificationsPlugin.schedule(
+      0,
+      'ALARM',
+      'GET UP!',
+      scheduledNotificationDateTime,
+      platformChannelSpecifics);
+}
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -42,6 +108,8 @@ class MyHomePage extends StatefulWidget {
 
   final String title;
 
+  
+
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
@@ -76,13 +144,23 @@ Future<DelayData> _fetchPost() async {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  String _alarm = "Not Entered";
-  double _alarmtime = 0;
-  double _maxtime = 0;
-  List<bool> pressed = new List.filled(25, false);
+
+  @override
+  initState() {
+    super.initState();
+    // initialise the plugin. app_icon needs to be a added as a drawable resource to the Android head project
+    var initializationSettingsAndroid =
+        AndroidInitializationSettings('app_icon');
+    var initializationSettingsIOS = IOSInitializationSettings();
+    var initializationSettings = InitializationSettings(initializationSettingsAndroid, initializationSettingsIOS);
+    flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  }
+  
 
   void _setAlarm() {
     setState(() {
+      date = new DateTime.now();
+      date = date.add(new Duration(days: 1));
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
       // so that the display can reflect the updated values. If we changed
@@ -119,48 +197,50 @@ class _MyHomePageState extends State<MyHomePage> {
         }
         String tim = "";
         if(maxhour < hour || (maxhour == hour && maxmin < min)){
+          _settime = _maxtime;
           if(maxhour >= 12){
             if(maxhour == 12){
               maxhour = 24;
             }
             if(maxmin < 10){
-              tim = (maxhour-12).toString() + ":0" + maxmin.toString();
+              tim = (maxhour-12).toString() + ":0" + maxmin.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString() ;
             }else{
-              tim = (maxhour-12).toString() + ":" + maxmin.toString();
+              tim = (maxhour-12).toString() + ":" + maxmin.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
             }
-            tim += " pm";
           }else{
             if(maxhour == 0){
               maxhour = 12;
             }
             if(maxmin < 10){
-              tim = (maxhour).toString() + ":0" + maxmin.toString();
+              tim = (maxhour).toString() + ":0" + maxmin.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
             }else{
-              tim = (maxhour).toString() + ":" + maxmin.toString();
+              tim = (maxhour).toString() + ":" + maxmin.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
             }
-            tim += " am";
           }
         }else{
+          _settime = _alarmtime;
+          while(hour < 0){
+            hour += 24;
+            date = date.add(new Duration(days: -1));
+          }
           if(hour >= 12){
             if(hour == 12){
               hour = 24;
             }
             if(min < 10){
-              tim = (hour-12).toString() + ":0" + min.toString();
+              tim = (hour-12).toString() + ":0" + min.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
             }else{
-              tim = (hour-12).toString() + ":" + min.toString();
+              tim = (hour-12).toString() + ":" + min.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
             }
-            tim += " pm";
           }else{
             if(hour == 0){
               hour = 12;
             }
             if(min < 10){
-              tim = (hour).toString() + ":0" + min.toString();
+              tim = (hour).toString() + ":0" + min.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
             }else{
-              tim = (hour).toString() + ":" + min.toString();
+              tim = (hour).toString() + ":" + min.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
             }
-            tim += " am";
           }
         }
         _alarm = tim;
@@ -171,6 +251,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _setAlarmTime(double time) {
     setState(() {
+      date = new DateTime.now();
+      date = date.add(new Duration(days: 1));
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
       // so that the display can reflect the updated values. If we changed
@@ -207,48 +289,50 @@ class _MyHomePageState extends State<MyHomePage> {
       }
       String tim = "";
       if(maxhour < hour || (maxhour == hour && maxmin < min)){
+        _settime = _maxtime;
         if(maxhour >= 12){
           if(maxhour == 12){
             maxhour = 24;
           }
           if(maxmin < 10){
-            tim = (maxhour-12).toString() + ":0" + maxmin.toString();
+            tim = (maxhour-12).toString() + ":0" + maxmin.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
           }else{
-            tim = (maxhour-12).toString() + ":" + maxmin.toString();
+            tim = (maxhour-12).toString() + ":" + maxmin.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
           }
-          tim += " pm";
         }else{
           if(maxhour == 0){
             maxhour = 12;
           }
           if(maxmin < 10){
-            tim = (maxhour).toString() + ":0" + maxmin.toString();
+            tim = (maxhour).toString() + ":0" + maxmin.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
           }else{
-            tim = (maxhour).toString() + ":" + maxmin.toString();
+            tim = (maxhour).toString() + ":" + maxmin.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
           }
-          tim += " am";
         }
       }else{
+        _settime = _alarmtime;
+        while(hour < 0){
+            hour += 24;
+            date = date.add(new Duration(days: -1));
+        }
         if(hour >= 12){
           if(hour == 12){
             hour = 24;
           }
           if(min < 10){
-            tim = (hour-12).toString() + ":0" + min.toString();
+            tim = (hour-12).toString() + ":0" + min.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
           }else{
-            tim = (hour-12).toString() + ":" + min.toString();
+            tim = (hour-12).toString() + ":" + min.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
           }
-          tim += " pm";
         }else{
           if(hour == 0){
             hour = 12;
           }
           if(min < 10){
-            tim = (hour).toString() + ":0" + min.toString();
+            tim = (hour).toString() + ":0" + min.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
           }else{
-            tim = (hour).toString() + ":" + min.toString();
+            tim = (hour).toString() + ":" + min.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
           }
-          tim += " am";
         }
       }
       _alarm = tim;
@@ -258,6 +342,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _setAlarmMax(double time) {
     setState(() {
+      date = new DateTime.now();
+      date = date.add(new Duration(days: 1));
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
       // so that the display can reflect the updated values. If we changed
@@ -295,52 +381,55 @@ class _MyHomePageState extends State<MyHomePage> {
         }
         String tim = "";
         if(maxhour < hour || (maxhour == hour && maxmin < min)){
+          _settime = _maxtime;
           if(maxhour >= 12){
             if(maxhour == 12){
               maxhour = 24;
             }
             if(maxmin < 10){
-              tim = (maxhour-12).toString() + ":0" + maxmin.toString();
+              tim = (maxhour-12).toString() + ":0" + maxmin.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
             }else{
-              tim = (maxhour-12).toString() + ":" + maxmin.toString();
+              tim = (maxhour-12).toString() + ":" + maxmin.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
             }
-            tim += " pm";
           }else{
             if(maxhour == 0){
               maxhour = 12;
             }
             if(maxmin < 10){
-              tim = (maxhour).toString() + ":0" + maxmin.toString();
+              tim = (maxhour).toString() + ":0" + maxmin.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
             }else{
-              tim = (maxhour).toString() + ":" + maxmin.toString();
+              tim = (maxhour).toString() + ":" + maxmin.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
             }
-            tim += " am";
           }
         }else{
+          _settime = _alarmtime;
+          while(hour < 0){
+            hour += 24;
+            date = date.add(new Duration(days: -1));
+          }
           if(hour >= 12){
             if(hour == 12){
               hour = 24;
             }
             if(min < 10){
-              tim = (hour-12).toString() + ":0" + min.toString();
+              tim = (hour-12).toString() + ":0" + min.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
             }else{
-              tim = (hour-12).toString() + ":" + min.toString();
+              tim = (hour-12).toString() + ":" + min.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
             }
-            tim += " pm";
           }else{
             if(hour == 0){
               hour = 12;
             }
             if(min < 10){
-              tim = (hour).toString() + ":0" + min.toString();
+              tim = (hour).toString() + ":0" + min.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
             }else{
-              tim = (hour).toString() + ":" + min.toString();
+              tim = (hour).toString() + ":" + min.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
             }
-            tim += " am";
           }
         }
         _alarm = tim;
       }else{
+        _settime = _maxtime;
         double maxmins = _maxtime % 1;
         int maxmin = (maxmins * 60).ceil();
         int maxhour = _maxtime.truncate();
@@ -357,21 +446,19 @@ class _MyHomePageState extends State<MyHomePage> {
             maxhour = 24;
           }
           if(maxmin < 10){
-            tim = (maxhour-12).toString() + ":0" + maxmin.toString();
+            tim = (maxhour-12).toString() + ":0" + maxmin.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
           }else{
-            tim = (maxhour-12).toString() + ":" + maxmin.toString();
+            tim = (maxhour-12).toString() + ":" + maxmin.toString() + " pm on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
           }
-          tim += " pm";
         }else{
           if(maxhour == 0){
             maxhour = 12;
           }
           if(maxmin < 10){
-            tim = (maxhour).toString() + ":0" + maxmin.toString();
+            tim = (maxhour).toString() + ":0" + maxmin.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
           }else{
-            tim = (maxhour).toString() + ":" + maxmin.toString();
+            tim = (maxhour).toString() + ":" + maxmin.toString() + " am on " + date.month.toString() + "/" + date.day.toString() + "/" + date.year.toString();
           }
-          tim += " am";
         }
         _alarm = tim;
       }
@@ -425,9 +512,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     TableCell(
                       child: 
                         GestureDetector(
-                          onTap: () {
+                          onTap: () async{
                             pressed[0] = !pressed[0];
                             _setAlarm();
+                            await _scheduleNotification();
+
                           },
                           child: Text("12:00 am",textAlign: TextAlign.center,)
                         ),
@@ -440,9 +529,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     TableCell(
                       child: 
                         GestureDetector(
-                          onTap: () {
+                          onTap: () async{
                             pressed[1] = !pressed[1];
                             _setAlarm();
+                            await _scheduleNotification();
+
                           },
                           child: Text("1:00 am",textAlign: TextAlign.center,)
                         ),
@@ -455,10 +546,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     TableCell(
                       child:
                         GestureDetector(
-                          onTap: () {
+                          onTap: () async{
                             pressed[2] = !pressed[2];
+                            await _cancelNotification();
                             _setAlarm();
-                              
+                            await _scheduleNotification(); 
                             
                           },
                           child: Text("2:00 am",textAlign: TextAlign.center,)
@@ -472,10 +564,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     TableCell(
                       child: 
                         GestureDetector(
-                          onTap: () {
+                          onTap: () async{
                             pressed[3] = !pressed[3];
+                            await _cancelNotification();
                             _setAlarm();
-                              
+                            await _scheduleNotification();  
                             
                           },
                           child: Text("3:00 am",textAlign: TextAlign.center,)
@@ -489,10 +582,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     TableCell(
                       child: 
                         GestureDetector(
-                          onTap: () {
+                          onTap: () async{
                             pressed[4] = !pressed[4];
+                            await _cancelNotification();
                             _setAlarm();
-                              
+                            await _scheduleNotification(); 
                             
                           },
                           child: Text("4:00 am",textAlign: TextAlign.center,)
@@ -505,10 +599,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     TableCell(
                       child: 
                         GestureDetector(
-                          onTap: () {
+                          onTap: () async{
                             pressed[5] = !pressed[5];
+                            await _cancelNotification();
                             _setAlarm();
-                              
+                            await _scheduleNotification(); 
                             
                           },
                           child: Text("5:00 am",textAlign: TextAlign.center,)
@@ -521,10 +616,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     TableCell(
                       child: 
                         GestureDetector(
-                          onTap: () {
+                          onTap: () async{
                             pressed[6] = !pressed[6];
+                            await _cancelNotification();
                             _setAlarm();
-                              
+                            await _scheduleNotification(); 
                             
                           },
                           child: Text("6:00 am",textAlign: TextAlign.center,)
@@ -537,10 +633,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     TableCell(
                       child: 
                         GestureDetector(
-                          onTap: () {
+                          onTap: () async{
                             pressed[7] = !pressed[7];
+                            await _cancelNotification();
                             _setAlarm();
-                              
+                            await _scheduleNotification();
                             
                           },
                           child: Text("7:00 am",textAlign: TextAlign.center,)
@@ -553,10 +650,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     TableCell(
                       child: 
                         GestureDetector(
-                          onTap: () {
+                          onTap: () async{
                             pressed[8] = !pressed[8];
+                            await _cancelNotification();
                             _setAlarm();
-                              
+                            await _scheduleNotification(); 
                             
                           },
                           child: Text("8:00 am",textAlign: TextAlign.center,)
@@ -569,10 +667,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     TableCell(
                       child: 
                         GestureDetector(
-                          onTap: () {
+                          onTap: () async{
                             pressed[9] = !pressed[9];
+                            await _cancelNotification();
                             _setAlarm();
-                              
+                            await _scheduleNotification();
                             
                           },
                           child: Text("9:00 am",textAlign: TextAlign.center,)
@@ -585,10 +684,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     TableCell(
                       child: 
                         GestureDetector(
-                          onTap: () {
+                          onTap: () async{
                             pressed[10] = !pressed[10];
+                            await _cancelNotification();
                             _setAlarm();
-                              
+                            await _scheduleNotification(); 
                             
                           },
                           child: Text("10:00 am",textAlign: TextAlign.center,)
@@ -601,10 +701,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     TableCell(
                       child: 
                         GestureDetector(
-                          onTap: () {
+                          onTap: () async{
                             pressed[11] = !pressed[11];
+                            await _cancelNotification();
                             _setAlarm();
-                              
+                            await _scheduleNotification();
                             
                           },
                           child: Text("11:00 am",textAlign: TextAlign.center,)
@@ -617,10 +718,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     TableCell(
                       child: 
                         GestureDetector(
-                          onTap: () {
+                          onTap: () async{
                             pressed[12] = !pressed[12];
+                            await _cancelNotification();
                             _setAlarm();
-                              
+                            await _scheduleNotification();
                             
                           },
                           child: Text("12:00 pm",textAlign: TextAlign.center,)
@@ -633,10 +735,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     TableCell(
                       child: 
                         GestureDetector(
-                          onTap: () {
+                          onTap: () async{
                             pressed[13] = !pressed[13];
+                            await _cancelNotification();
                             _setAlarm();
-                              
+                            await _scheduleNotification();
                             
                           },
                           child: Text("1:00 pm",textAlign: TextAlign.center,)
@@ -649,10 +752,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     TableCell(
                       child: 
                         GestureDetector(
-                          onTap: () {
+                          onTap: () async{
                             pressed[14] = !pressed[14];
+                            await _cancelNotification();
                             _setAlarm();
-                              
+                            await _scheduleNotification();
                             
                           },
                           child: Text("2:00 pm",textAlign: TextAlign.center,)
@@ -665,10 +769,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     TableCell(
                       child: 
                         GestureDetector(
-                          onTap: () {
+                          onTap: () async{
                             pressed[15] = !pressed[15];
+                            await _cancelNotification();
                             _setAlarm();
-                              
+                            await _scheduleNotification(); 
                             
                           },
                           child: Text("3:00 pm",textAlign: TextAlign.center,)
@@ -681,10 +786,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     TableCell(
                       child: 
                         GestureDetector(
-                          onTap: () {
+                          onTap: () async{
                             pressed[16] = !pressed[16];
+                            await _cancelNotification();
                             _setAlarm();
-                              
+                            await _scheduleNotification();
                             
                           },
                           child: Text("4:00 pm",textAlign: TextAlign.center,)
@@ -697,10 +803,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     TableCell(
                       child: 
                         GestureDetector(
-                          onTap: () {
+                          onTap: () async{
                             pressed[17] = !pressed[17];
+                            await _cancelNotification();
                             _setAlarm();
-                              
+                            await _scheduleNotification();
                             
                           },
                           child: Text("5:00 pm",textAlign: TextAlign.center,)
@@ -713,10 +820,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     TableCell(
                       child: 
                         GestureDetector(
-                          onTap: () {
+                          onTap: () async{
                             pressed[18] = !pressed[18];
+                            await _cancelNotification();
                             _setAlarm();
-                              
+                            await _scheduleNotification(); 
                             
                           },
                           child: Text("6:00 pm",textAlign: TextAlign.center,)
@@ -729,10 +837,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     TableCell(
                       child: 
                         GestureDetector(
-                          onTap: () {
+                          onTap: () async{
                             pressed[19] = !pressed[19];
+                            await _cancelNotification();
                             _setAlarm();
-                              
+                            await _scheduleNotification(); 
                             
                           },
                           child: Text("7:00 pm",textAlign: TextAlign.center,)
@@ -745,10 +854,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     TableCell(
                       child: 
                         GestureDetector(
-                          onTap: () {
+                          onTap: () async{
                             pressed[20] = !pressed[20];
+                            await _cancelNotification();
                             _setAlarm();
-                              
+                            await _scheduleNotification();
                             
                           },
                           child: Text("8:00 pm",textAlign: TextAlign.center,)
@@ -761,10 +871,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     TableCell(
                       child: 
                         GestureDetector(
-                          onTap: () {
+                          onTap: () async{
                             pressed[21] = !pressed[21];
+                            await _cancelNotification();
                             _setAlarm();
-                              
+                            await _scheduleNotification();
                             
                           },
                           child: Text("9:00 pm",textAlign: TextAlign.center,)
@@ -777,10 +888,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     TableCell(
                       child: 
                         GestureDetector(
-                          onTap: () {
+                          onTap: () async{
                             pressed[22] = !pressed[22];
+                            await _cancelNotification();
                             _setAlarm();
-                              
+                            await _scheduleNotification();
                             
                           },
                           child: Text("10:00 pm",textAlign: TextAlign.center,)
@@ -793,10 +905,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     TableCell(
                       child: 
                         GestureDetector(
-                          onTap: () {
+                          onTap: () async{
                             pressed[23] = !pressed[23];
+                            await _cancelNotification();
                             _setAlarm();
-                              
+                            await _scheduleNotification();
                             
                           },
                           child: Text("11:00 pm",textAlign: TextAlign.center,)
@@ -809,10 +922,11 @@ class _MyHomePageState extends State<MyHomePage> {
                     TableCell(
                       child: 
                         GestureDetector(
-                          onTap: () {
+                          onTap: () async{
                             pressed[24] = !pressed[24];
+                            await _cancelNotification();
                             _setAlarm();
-                              
+                            await _scheduleNotification();
                             
                           },
                           child: Text("12:00 am",textAlign: TextAlign.center,)
@@ -825,35 +939,39 @@ class _MyHomePageState extends State<MyHomePage> {
               height:20
             ),
             Text(
-              "Please enter how many hours you wish to wake up before your first blocked off activity:"
+              "Please enter how many hours you wish to wake up before your first blocked off activity:", textAlign: TextAlign.center,
             ),
             TextField (
               textAlign: TextAlign.center,
-              keyboardType: TextInputType.datetime,
+              keyboardType: TextInputType.number,
               style: TextStyle(color: Colors.black, fontWeight: FontWeight.w500),
-              onSubmitted: (value){
+              onSubmitted: (value) async{
+                await _cancelNotification();
                 _setAlarmTime(double.parse(value));
+                await _scheduleNotification();
               },
             ),
             SizedBox(
               height:20
             ),
             Text(
-              "Please enter the latest hour in 24 hour time you wish to wake up in the event of a cancellation:"
+              "Please enter the latest hour in 24 hour time you wish to wake up in the event of a cancellation:", textAlign: TextAlign.center,
             ),
             TextField (
               textAlign: TextAlign.center,
-              keyboardType: TextInputType.datetime,
+              keyboardType: TextInputType.number,
               style: TextStyle(color: Colors.black, fontWeight: FontWeight.w500),
-              onSubmitted: (value) async {
+              onSubmitted: (value) async{
+                await _cancelNotification();
                 _setAlarmMax(double.parse(value));
+                await _scheduleNotification();
               },
             ),
             SizedBox(
               height:10
             ),
             Text(
-              'Your alarm is currently set for:',
+              'Your alarm is currently set for:', textAlign: TextAlign.center,
             ),
             SizedBox(
               height:10
