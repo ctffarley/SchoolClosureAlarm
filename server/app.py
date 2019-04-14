@@ -6,7 +6,7 @@ app = Flask(__name__)
 @app.route('/api/closure', methods=['GET'])
 def get_date():
     date = next_close()
-    date[1] = date[1].replace(',', '')
+    # date[1] = date[1].replace(',', '') commented out for fake data
     return jsonify({
         "month": date[0],
         "num": int(date[1]),
